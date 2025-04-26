@@ -1,13 +1,16 @@
 from domain.task import Task
+from infra.database import SessionLocal
 
 class TaskService:
     def __init__(self):
-        self.tasks = []
+        self.db = SessionLocal()
 
     def add_task(self, title, description):
         task = Task(title, description)
-        self.tasks.append(task)
+        self.db.add(task)
+        self.db.commit()
+        self.db.refresh(task)
         return task
 
     def list_tasks(self):
-        return self.tasks
+        return self.db.query(Task).all()
