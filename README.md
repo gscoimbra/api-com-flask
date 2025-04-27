@@ -28,8 +28,8 @@ Ela permite criar e listar tarefas, possui documentação Swagger integrada e su
 ### 1. Clone o repositório
 
 ```bash
-git clone https://github.com/gscoimbra/api-em-flask.git
-cd api-em-flask
+git clone https://github.com/gscoimbra/api-com-flask.git
+cd api-com-flask
 ```
 
 ### 2. Suba os contêineres
