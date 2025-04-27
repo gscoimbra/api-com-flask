@@ -19,8 +19,6 @@ Ela permite criar e listar tarefas, possui documentação Swagger integrada e su
 - Docker Compose
 - GitHub Actions (CI/CD)
 
----
-
 ## ⚙️ Como rodar o projeto
 
 > Requisitos:
