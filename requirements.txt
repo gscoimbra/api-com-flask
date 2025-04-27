@@ -1,2 +1,7 @@
-Flask
+flask
 flasgger
+sqlalchemy
+psycopg2-binary
+pandas
+celery
+redis
