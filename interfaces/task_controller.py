@@ -1,70 +1,30 @@
 from flask import Blueprint, request, jsonify
+from infra.database import SessionLocal
 from usecases.task_service import TaskService
-from flasgger.utils import swag_from
-from usecases.notification_service import send_notification
 
-task_bp = Blueprint('task_bp', __name__)
-task_service = TaskService()
+def create_task_blueprint():
+    task_bp = Blueprint('task_bp', __name__)
 
-@task_bp.route('/tasks', methods=['POST'])
-@swag_from({
-    'tags': ['Tasks'],
-    'parameters': [
-        {
-            'name': 'body',
-            'in': 'body',
-            'required': True,
-            'schema': {
-                'type': 'object',
-                'properties': {
-                    'title': {'type': 'string'},
-                    'description': {'type': 'string'}
-                },
-                'required': ['title', 'description']
-            }
-        }
-    ],
-    'responses': {
-        201: {
-            'description': 'Tarefa criada com sucesso',
-            'schema': {
-                'type': 'object',
-                'properties': {
-                    'title': {'type': 'string'},
-                    'description': {'type': 'string'}
-                }
-            }
-        }
-    }
-})
-def create_task():
-    data = request.json
-    task = task_service.add_task(data['title'], data['description'])
+    @task_bp.route('/tasks', methods=['POST'])
+    def create_task():
+        data = request.get_json()
+        title = data.get('title')
+        description = data.get('description')
 
-    # Dispara a notificação assíncrona com Celery
-    send_notification.delay(task.title)
+        service = TaskService(SessionLocal())
+        task = service.create_task(title, description)
 
-    return jsonify({'title': task.title, 'description': task.description}), 201
+        return jsonify({
+            "id": task.id,
+            "title": task.title,
+            "description": task.description
+        }), 201
 
-@task_bp.route('/tasks', methods=['GET'])
-@swag_from({
-    'tags': ['Tasks'],
-    'responses': {
-        200: {
-            'description': 'Lista de tarefas',
-            'schema': {
-                'type': 'array',
-                'items': {
-                    'type': 'object',
-                    'properties': {
-                        'title': {'type': 'string'},
-                        'description': {'type': 'string'}
-                    }
-                }
-            }
-        }
-    }
-})
-def get_tasks():
-    tasks = task_service.list_tasks()
-    return jsonify([{'title': t.title, 'description': t.description} for t in tasks])
+    @task_bp.route('/tasks', methods=['GET'])
+    def list_tasks():
+        service = TaskService(SessionLocal())
+        tasks = service.get_tasks()
+
+        return jsonify([{'title': t.title, 'description': t.description} for t in tasks])
+
+    return task_bp

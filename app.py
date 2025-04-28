@@ -1,11 +1,11 @@
 from flask import Flask
-from interfaces.task_controller import task_bp
-from flasgger import Swagger
+from interfaces.task_controller import create_task_blueprint
 
-app = Flask(__name__)
-swagger = Swagger(app)
 
-app.register_blueprint(task_bp)
+def create_app():
+    app = Flask(__name__)
 
-if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000, debug=True)
+    task_bp = create_task_blueprint()
+    app.register_blueprint(task_bp)
+
+    return app
